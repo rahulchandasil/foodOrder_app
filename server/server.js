@@ -1,4 +1,8 @@
-require("dotenv").config();
+try {
+  require("dotenv").config();
+} catch (error) {
+  // Render and other environments can rely on real environment variables.
+}
 
 const app = require("./app.js");
 const connectDB = require("./src/config/db.js");
