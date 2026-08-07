@@ -9,6 +9,7 @@ app.use(express.json());
 const allowedOrigins = [
   "http://localhost:4000",
   "http://localhost:5173",
+  "https://food-order-app-omega-kohl.vercel.app/",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
