@@ -6,11 +6,18 @@ const foodRouter = require("./src/routes/food.Route.js");
 const cartRouter = require("./src/routes/cart.Route.js")
 const orderRouter = require("./src/routes/order.Route.js")
 app.use(express.json());
-app.use(cors({
-  origin: [
-    "http://localhost:4000",
-  ]
-}));
+const allowedOrigins = [
+  "http://localhost:4000",
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 app.use(express.urlencoded({extended:true}));
 
 app.get("/",(req,res)=>{
