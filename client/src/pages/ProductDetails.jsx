@@ -17,8 +17,14 @@ const ProductDetails = () => {
 
   const fetchFood = async () => {
     try {
-      const response = await api.get(`/foods/${id}`);
-      setFood(response.data.food);
+      const response = await api.get("/foods");
+      const selectedFood = response.data.foods.find((item) => item._id === id);
+
+      if (!selectedFood) {
+        return navigate("/");
+      }
+
+      setFood(selectedFood);
     } catch (error) {
       console.log(error);
       navigate("/");
