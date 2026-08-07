@@ -3,7 +3,7 @@ const express = require("express");
 const {
   placeOrder,
   getOrders,
-} = require("../controllers/order.controller");
+} = require("../controllers/order.Controller.js");
 
 const orderRouter = express.Router();
 
