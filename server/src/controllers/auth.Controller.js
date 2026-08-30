@@ -12,15 +12,16 @@ const generateToken = (id) => {
 const register = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
 
-  const userExists = await User.findOne({ email });
+  const cleanEmail = email ? email.trim().toLowerCase() : "";
+  const userExists = await User.findOne({ email: cleanEmail });
 
   if (userExists) {
-    return next(new ErrorResponse("User already exists", 400));
+    return next(new ErrorResponse("User already exists with this email", 400));
   }
 
   const user = await User.create({
-    name,
-    email,
+    name: name ? name.trim() : "",
+    email: cleanEmail,
     password,
   });
 
@@ -38,10 +39,11 @@ const register = asyncHandler(async (req, res, next) => {
 const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select("+password");
+  const cleanEmail = email ? email.trim().toLowerCase() : "";
+  const user = await User.findOne({ email: cleanEmail }).select("+password");
 
   if (!user || !(await user.comparePassword(password))) {
-    return next(new ErrorResponse("Invalid credentials", 401));
+    return next(new ErrorResponse("Invalid email or password", 401));
   }
 
   const token = generateToken(user._id);

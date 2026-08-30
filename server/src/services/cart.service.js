@@ -2,12 +2,21 @@ const Cart = require("../models/cart.model.js");
 const Food = require("../models/food.model.js");
 const ErrorResponse = require("../utils/ErrorResponse.js");
 
+const sanitizeCart = (cart) => {
+  if (!cart) return null;
+  const cartObj = cart.toObject ? cart.toObject() : cart;
+  if (cartObj.items) {
+    cartObj.items = cartObj.items.filter((item) => item.foodId != null);
+  }
+  return cartObj;
+};
+
 const getCartByUserId = async (userId) => {
   let cart = await Cart.findOne({ userId }).populate("items.foodId");
   if (!cart) {
     return { success: true, items: [] };
   }
-  return { success: true, cart };
+  return { success: true, cart: sanitizeCart(cart) };
 };
 
 const addItemToCart = async (userId, foodId, quantity) => {
@@ -37,7 +46,8 @@ const addItemToCart = async (userId, foodId, quantity) => {
 
     await cart.save();
   }
-  return await cart.populate("items.foodId");
+  const populatedCart = await Cart.findById(cart._id).populate("items.foodId");
+  return sanitizeCart(populatedCart);
 };
 
 const updateCartItemQuantity = async (userId, itemId, quantity) => {
@@ -54,7 +64,8 @@ const updateCartItemQuantity = async (userId, itemId, quantity) => {
   item.quantity = quantity;
 
   await cart.save();
-  return await cart.populate("items.foodId");
+  const populatedCart = await Cart.findById(cart._id).populate("items.foodId");
+  return sanitizeCart(populatedCart);
 };
 
 const removeItemFromCart = async (userId, itemId) => {
@@ -69,7 +80,8 @@ const removeItemFromCart = async (userId, itemId) => {
 
   cart.items.pull(itemId);
   await cart.save();
-  return await cart.populate("items.foodId");
+  const populatedCart = await Cart.findById(cart._id).populate("items.foodId");
+  return sanitizeCart(populatedCart);
 };
 
 module.exports = {

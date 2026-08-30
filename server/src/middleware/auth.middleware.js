@@ -16,7 +16,15 @@ const isAuth = async (req, res, next) => {
         process.env.JWT_SECRET
       );
 
-      req.user = await User.findById(decoded.id).select("-password");
+      const userId = decoded.id || decoded._id || decoded.userId;
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Not authorized, invalid token payload",
+        });
+      }
+
+      req.user = await User.findById(userId).select("-password");
 
       if (!req.user) {
         return res.status(401).json({
