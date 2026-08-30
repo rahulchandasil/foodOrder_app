@@ -7,7 +7,7 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
-};
+}; 
 
 const register = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
