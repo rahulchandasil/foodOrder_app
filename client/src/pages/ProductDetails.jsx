@@ -36,13 +36,15 @@ const ProductDetails = () => {
       navigate("/cart");
     },
     onError: (err) => {
-      toastError("Unable to add item to cart. Please try again.");
+      const errMsg = err.response?.data?.message || "Unable to add item to cart. Please try again.";
+      toastError(errMsg);
       console.error(err);
     }
   });
 
   const handleAddToCart = () => {
-    if (!user) return navigate("/login");
+    const token = localStorage.getItem("token");
+    if (!user || !token) return navigate("/login");
     addToCartMutation.mutate();
   };
 

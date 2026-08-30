@@ -21,7 +21,8 @@ const FoodCard = React.memo(function FoodCard({ food }) {
       success(`${food.name} added to cart`);
     },
     onError: (err) => {
-      error("Unable to add item to cart. Please try again.");
+      const errMsg = err.response?.data?.message || "Unable to add item to cart. Please try again.";
+      error(errMsg);
       console.error("ADD TO CART ERROR:", err.response?.status, err.response?.data, err);
     }
   });
@@ -29,7 +30,8 @@ const FoodCard = React.memo(function FoodCard({ food }) {
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!user) {
+    const token = localStorage.getItem("token");
+    if (!user || !token) {
       return navigate("/login");
     }
     addToCartMutation.mutate();

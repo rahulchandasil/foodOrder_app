@@ -34,8 +34,8 @@ const Register = () => {
     try {
       setLoading(true);
       const res = await api.post("/auth/register", {
-        name: formData.name,
-        email: formData.email,
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
       if (res.data.token) {

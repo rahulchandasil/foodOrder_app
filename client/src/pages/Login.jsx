@@ -25,7 +25,10 @@ const Login = () => {
     if (!validate()) return;
     try {
       setLoading(true);
-      const response = await api.post("/auth/login", formData);
+      const response = await api.post("/auth/login", {
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      });
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       setUser(response.data.user);

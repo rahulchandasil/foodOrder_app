@@ -60,7 +60,7 @@ const Cart = () => {
     removeItemMutation.mutate(itemId);
   };
 
-  const total = useMemo(() => cart?.items.reduce((sum, item) => sum + item.foodId.price * item.quantity, 0) || 0, [cart]);
+  const total = useMemo(() => cart?.items?.reduce((sum, item) => sum + (item.foodId?.price || 0) * item.quantity, 0) || 0, [cart]);
 
   if (!user) {
     navigate("/login");
