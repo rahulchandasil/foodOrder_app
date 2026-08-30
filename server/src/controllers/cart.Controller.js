@@ -1,132 +1,50 @@
-const Cart = require("../models/cart.model.js");
+const asyncHandler = require("../utils/asyncHandler.js");
+const cartService = require("../services/cart.service.js");
 
+const getCart = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const result = await cartService.getCartByUserId(userId);
+  res.status(200).json(result);
+});
 
-const getCart = async (req, res) => {
-  try {
-    const { userId } = req.query;
+const addToCart = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const { foodId, quantity } = req.body;
+  const cart = await cartService.addItemToCart(userId, foodId, quantity);
 
-    const cart = await Cart.findOne({ userId }).populate("items.foodId");
+  res.status(200).json({
+    success: true,
+    message: "Item added to cart",
+    cart,
+  });
+});
 
-    if (!cart) {
-      return res.status(200).json({
-        success: true,
-        items: [],
-      });
-    }
+const updateCart = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const itemId = req.params.id;
+  const { quantity } = req.body;
+  
+  const cart = await cartService.updateCartItemQuantity(userId, itemId, quantity);
 
-    res.status(200).json({
-      success: true,
-      cart,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+  res.status(200).json({
+    success: true,
+    message: "Cart updated",
+    cart,
+  });
+});
 
-const addToCart = async (req, res) => {
-  try {
-    const { userId, foodId, quantity } = req.body;
+const removeCartItem = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const itemId = req.params.id;
 
-    let cart = await Cart.findOne({ userId });
+  const cart = await cartService.removeItemFromCart(userId, itemId);
 
-    if (!cart) {
-      cart = await Cart.create({
-        userId,
-        items: [{ foodId, quantity }],
-      });
-    } else {
-      const itemIndex = cart.items.findIndex(
-        (item) => item.foodId.toString() === foodId
-      );
-
-      if (itemIndex > -1) {
-        cart.items[itemIndex].quantity += quantity;
-      } else {
-        cart.items.push({ foodId, quantity });
-      }
-
-      await cart.save();
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Item added to cart",
-      cart,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-const updateCart = async (req, res) => {
-  try {
-    const { quantity } = req.body;
-
-    const cart = await Cart.findOne({
-      "items._id": req.params.id,
-    });
-
-    if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: "Cart item not found",
-      });
-    }
-
-    const item = cart.items.id(req.params.id);
-
-    item.quantity = quantity;
-
-    await cart.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Cart updated",
-      cart,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-const removeCartItem = async (req, res) => {
-  try {
-    const cart = await Cart.findOne({
-      "items._id": req.params.id,
-    });
-
-    if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: "Item not found",
-      });
-    }
-
-    cart.items.pull(req.params.id);
-
-    await cart.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Item removed",
-      cart,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+  res.status(200).json({
+    success: true,
+    message: "Item removed",
+    cart,
+  });
+});
 
 module.exports = {
   getCart,

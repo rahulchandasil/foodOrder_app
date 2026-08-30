@@ -1,79 +1,47 @@
 const Food = require("../models/food.model.js");
+const asyncHandler = require("../utils/asyncHandler.js");
+const ErrorResponse = require("../utils/ErrorResponse.js");
 
+const addFood = asyncHandler(async (req, res, next) => {
+  const { name, description, price, category, image } = req.body;
 
-const addFood = async (req, res) => {
-  try {
-    const { name, description, price, category, image } = req.body;
+  const food = await Food.create({
+    name,
+    description,
+    price,
+    category,
+    image,
+  });
 
-    if (!name || !description || !price || !category || !image) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
+  res.status(201).json({
+    success: true,
+    message: "Food added successfully",
+    food,
+  });
+});
 
-    const food = await Food.create({
-      name,
-      description,
-      price,
-      category,
-      image,
-    });
+const getAllFoods = asyncHandler(async (req, res, next) => {
+  const foods = await Food.find();
 
-    res.status(201).json({
-      success: true,
-      message: "Food added successfully",
-      food,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+  res.status(200).json({
+    success: true,
+    count: foods.length,
+    foods,
+  });
+});
+
+const getFoodById = asyncHandler(async (req, res, next) => {
+  const food = await Food.findById(req.params.id);
+
+  if (!food) {
+    return next(new ErrorResponse("Food not found", 404));
   }
-};
 
-
-const getAllFoods = async (req, res) => {
-  try {
-    const foods = await Food.find();
-
-    res.status(200).json({
-      success: true,
-      count: foods.length,
-      foods,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-
-const getFoodById = async (req, res) => {
-  try {
-    const food = await Food.findById(req.params.id);
-
-    if (!food) {
-      return res.status(404).json({
-        success: false,
-        message: "Food not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      food,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+  res.status(200).json({
+    success: true,
+    food,
+  });
+});
 
 module.exports = {
   addFood,

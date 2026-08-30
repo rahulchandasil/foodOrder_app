@@ -1,4 +1,5 @@
 const express = require("express");
+const { isAuth } = require("../middleware/auth.middleware.js");
 
 const {
   getCart,
@@ -9,12 +10,12 @@ const {
 
 const cartRouter = express.Router();
 
-cartRouter.get("/", getCart);
+const { addToCartValidation, updateCartValidation } = require("../validations/cart.validation.js");
+const validate = require("../middleware/validate.middleware.js");
 
-cartRouter.post("/", addToCart);
-
-cartRouter.put("/:id", updateCart);
-
-cartRouter.delete("/:id", removeCartItem);
+cartRouter.get("/", isAuth, getCart);
+cartRouter.post("/", isAuth, addToCartValidation, validate, addToCart);
+cartRouter.put("/:id", isAuth, updateCartValidation, validate, updateCart);
+cartRouter.delete("/:id", isAuth, removeCartItem);
 
 module.exports = cartRouter;

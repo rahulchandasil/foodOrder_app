@@ -7,6 +7,7 @@ const authRouter = require("./src/routes/auth.Route.js");
 const foodRouter = require("./src/routes/food.Route.js");
 const cartRouter = require("./src/routes/cart.Route.js");
 const orderRouter = require("./src/routes/order.Route.js");
+const errorHandler = require("./src/middleware/error.middleware.js");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,5 +43,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/foods", foodRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/orders", orderRouter);
+
+app.use(errorHandler);
 
 module.exports = app;

@@ -1,4 +1,5 @@
 const express = require("express");
+const { isAuth } = require("../middleware/auth.middleware.js");
 
 const {
   placeOrder,
@@ -6,9 +7,11 @@ const {
 } = require("../controllers/order.Controller.js");
 
 const orderRouter = express.Router();
+const { placeOrderValidation } = require("../validations/order.validation.js");
+const validate = require("../middleware/validate.middleware.js");
 
-orderRouter.post("/", placeOrder);
+orderRouter.post("/", isAuth, placeOrderValidation, validate, placeOrder);
 
-orderRouter.get("/", getOrders);
+orderRouter.get("/", isAuth, getOrders);
 
 module.exports = orderRouter;
